@@ -54,8 +54,6 @@ fun MainScreen() {
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         LazyColumn {  }
-
-
         Text(text = "Проверка")
         Spacer(modifier = Modifier.height(10.dp))
         Button(
