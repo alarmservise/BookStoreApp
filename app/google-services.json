@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "92282358925",
+    "project_id": "bookstore-83932",
+    "storage_bucket": "bookstore-83932.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92282358925:android:45a74d3f88f68672d7a6c4",
+        "android_client_info": {
+          "package_name": "com.alarmservise.bookstoreapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHj_KpV_XMWfqw5W0BBBM_4DsfdsOqP7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
