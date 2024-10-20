@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
@@ -44,17 +45,38 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
 
     var fs = Firebase.firestore
-    
+
     var list = remember {
-        mutableStateOf(emptyList< Book >())
+        mutableStateOf(emptyList<Book>())
+    }
+
+    fs.collection("books").addSnapshotListener{snapShot,exception ->
+        list.value = snapShot?.toObjects(Book::class.java)?: emptyList()
     }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        LazyColumn {  }
-        Text(text = "Проверка")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+
+        ) {
+            items(list.value) { book ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    Text(text = book.name, modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth()
+                        .padding(15.dp))
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(10.dp))
         Button(
             modifier = Modifier
