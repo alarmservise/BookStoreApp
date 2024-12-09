@@ -5,8 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,7 +49,32 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            val fs = Firebase.firestore
+            val storage = Firebase.storage.reference.child("images")
+
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia()
+            ) { uri ->
+                if (uri == null) return@rememberLauncherForActivityResult
+
+                val task = storage.child("test.jpg").putBytes(
+                    bitmapToByteArray(this)
+                )
+                task.addOnSuccessListener { uploadTask ->
+                    uploadTask.metadata?.reference?.downloadUrl?.addOnCompleteListener { uriTask ->
+                        saveBook(fs, uriTask.result.toString())
+
+                    }
+
+                }
+
+            }
+
+            MainScreen{
+                launcher.launch(PickVisualMediaRequest(
+                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                ))
+            }
         }
 
 
@@ -54,7 +82,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(onClick: () -> Unit) {
     val context = LocalContext.current
     val fs = Firebase.firestore
     val storage = Firebase.storage.reference.child("images")
@@ -82,9 +110,10 @@ fun MainScreen() {
                         .fillMaxWidth()
                         .padding(10.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxWidth(),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    ) {
                         AsyncImage(
                             model = book.imageUrl,
                             contentDescription = null,
@@ -107,19 +136,10 @@ fun MainScreen() {
         Spacer(modifier = Modifier.height(10.dp))
         Button(modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp, 50.dp), onClick = {
-            val task = storage.child("cat.jpg").putBytes(
-                bitmapToByteArray(context)
-            )
-            task.addOnSuccessListener { uploadTask ->
-                uploadTask.metadata?.reference?.downloadUrl?.addOnCompleteListener { uriTask ->
-                        saveBook(fs, uriTask.result.toString())
-
-                    }
-
-            }
-
-        }) {
+            .padding(10.dp, 50.dp),
+            onClick = {
+                onClick()
+            }) {
             Text(
                 text = "Add Book!"
             )
