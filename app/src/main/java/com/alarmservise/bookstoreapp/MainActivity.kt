@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.alarmservise.bookstoreapp.data.Book
+import com.alarmservise.bookstoreapp.ui.login.LoginScreen
 import com.alarmservise.bookstoreapp.ui.theme.BookStoreAppTheme
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,119 +50,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val fs = Firebase.firestore
-            val storage = Firebase.storage.reference.child("images")
+            LoginScreen()
 
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.PickVisualMedia()
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-
-                val task = storage.child("test.jpg").putBytes(
-                    bitmapToByteArray(this)
-                )
-                task.addOnSuccessListener { uploadTask ->
-                    uploadTask.metadata?.reference?.downloadUrl?.addOnCompleteListener { uriTask ->
-                        saveBook(fs, uriTask.result.toString())
-
-                    }
-
-                }
-
-            }
-
-            MainScreen{
-                launcher.launch(PickVisualMediaRequest(
-                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
-                ))
-            }
-        }
-
-
-    }
-}
-
-@Composable
-fun MainScreen(onClick: () -> Unit) {
-    val context = LocalContext.current
-    val fs = Firebase.firestore
-    val storage = Firebase.storage.reference.child("images")
-
-    val list = remember {
-        mutableStateOf(emptyList<Book>())
-    }
-
-    fs.collection("books").addSnapshotListener { snapShot, exception ->
-        list.value = snapShot?.toObjects(Book::class.java) ?: emptyList()
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-
-        ) {
-            items(list.value) { book ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = book.imageUrl,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .height(100.dp)
-                                .width(100.dp)
-                        )
-                        Text(
-                            text = book.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth()
-                                .padding(15.dp)
-                        )
-                    }
-
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Button(modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp, 50.dp),
-            onClick = {
-                onClick()
-            }) {
-            Text(
-                text = "Add Book!"
-            )
         }
     }
 }
 
-private fun bitmapToByteArray(context: Context): ByteArray {
-    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cat)
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-    return baos.toByteArray()
-}
-
-private fun saveBook(fs: FirebaseFirestore, url: String) {
-    fs.collection("books").document().set(
-        Book(
-            name = "my Book",
-            description = "Bla-bla-bla",
-            price = "100",
-            category = "fiction",
-            imageUrl = url
-        )
-    )
-}
