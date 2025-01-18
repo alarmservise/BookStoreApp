@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.alarmservise.bookstoreapp.data.Book
 import com.alarmservise.bookstoreapp.ui.login.LoginScreen
+import com.alarmservise.bookstoreapp.ui.main_screen.MainScreen
 import com.alarmservise.bookstoreapp.ui.theme.BookStoreAppTheme
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen()
+            MainScreen()
 
         }
     }
