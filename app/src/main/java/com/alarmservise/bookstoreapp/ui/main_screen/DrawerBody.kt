@@ -83,7 +83,6 @@ fun DrawerBody() {
                                 .height(1.dp)
                                 .background(GrayLight)
                         )
-
                     }
                 }
             }
