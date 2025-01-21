@@ -32,6 +32,7 @@ fun DrawerBody() {
         "Fantasy",
         "Drama",
         "Bestsellers"
+
     )
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
