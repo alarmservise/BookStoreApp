@@ -31,7 +31,8 @@ fun DrawerBody() {
         "Favorites",
         "Fantasy",
         "Drama",
-        "Bestsellers"
+        "Bestsellers",
+        "test"
 
     )
     Box(modifier = Modifier.fillMaxSize()) {
