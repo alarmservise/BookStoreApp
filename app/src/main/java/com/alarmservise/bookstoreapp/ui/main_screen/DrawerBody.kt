@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alarmservise.bookstoreapp.R
+import com.alarmservise.bookstoreapp.ui.theme.ButtonColor
+import com.alarmservise.bookstoreapp.ui.theme.DarkBlue
 import com.alarmservise.bookstoreapp.ui.theme.GrayLight
 
 @Composable
@@ -35,7 +37,7 @@ fun DrawerBody() {
         "test"
 
     )
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkBlue)) {
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(id = R.drawable.book_store_bg),

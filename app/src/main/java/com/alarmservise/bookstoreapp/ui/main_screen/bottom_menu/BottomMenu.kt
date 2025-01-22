@@ -22,16 +22,18 @@ fun BottomMenu() {
     NavigationBar {
         items.forEach { item ->
             NavigationBarItem(
-                selected = false,
-                onClick = {},
+                selected = selectedItem.value ==item.title,
+                onClick = {
+                    selectedItem.value =item.title
+                },
                 icon = {
                     Icon(
-                        painter = painterResource(id = BottomMenuItem.Home.iconId),
+                        painter = painterResource(id = item.iconId),
                         contentDescription = null
                     )
                 },
                 label = {
-                    Text(text = BottomMenuItem.Home.title)
+                    Text(text = item.title)
                 }
             )
         }
