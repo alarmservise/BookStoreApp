@@ -1,8 +1,8 @@
 package com.alarmservise.bookstoreapp.ui.login
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.content.MediaType.Companion.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,15 +22,27 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alarmservise.bookstoreapp.R
 import com.alarmservise.bookstoreapp.ui.theme.BoxFilterColor
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun LoginScreen() {
 
-    var emailState = remember {
+    val auth = remember {
+        Firebase.auth
+    }
+
+    val errorState = remember {
+        mutableStateOf("")
+    }
+
+    val emailState = remember {
         mutableStateOf("")
     }
     val passwordState = remember {
@@ -90,8 +102,83 @@ fun LoginScreen() {
             passwordState.value = it
         }
         Spacer(modifier = Modifier.height(10.dp))
-        LoginButton(text = "Sign In") { }
-        LoginButton(text = "Sign Up") { }
+        if (errorState.value.isNotEmpty()) {
+            Text(
+            text = errorState.value,
+            color = Color.Red,
+            fontSize = 30.sp,
+            textAlign = TextAlign.Center
+            )
+        }
+        LoginButton(text = "Sign In") {
+            signIn(
+                auth,
+                emailState.value,
+                passwordState.value,
+                onSignInSuccess = {
+                    Log.d("MyLog", "Sign In Success")
+                },
+                onSignInFailure = { error ->
+                    errorState.value = error
+                }
+            )
+        }
+        LoginButton(text = "Sign Up") {
+            signUp(
+                auth,
+                emailState.value,
+                passwordState.value,
+                onSignUpSuccess = {
+                    Log.d("MyLog", "Sign Up Success")
+                },
+                onSignUpFailure = { error ->
+                    errorState.value = error
+                }
+            )
+        }
 
     }
+}
+
+fun signUp(
+    auth: FirebaseAuth,
+    email: String,
+    password: String,
+    onSignUpSuccess: () -> Unit,
+    onSignUpFailure: (String) -> Unit
+){
+    if(email.isBlank() || password.isBlank()){
+        onSignUpFailure("Email and password cannot be empty")
+        return
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener{ task ->
+            if (task.isSuccessful) onSignUpSuccess()
+        }
+        .addOnFailureListener {
+            onSignUpFailure(it.message ?: "Sign Up Error")
+        }
+
+}
+fun signIn(
+    auth: FirebaseAuth,
+    email: String,
+    password: String,
+    onSignInSuccess: () -> Unit,
+    onSignInFailure: (String) -> Unit
+){
+    if(email.isBlank() || password.isBlank()){
+        onSignInFailure("Email and password cannot be empty")
+        return
+    }
+
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener{ task ->
+            if (task.isSuccessful) onSignInSuccess()
+        }
+        .addOnFailureListener {
+            onSignInFailure(it.message ?: "Sign In Error")
+        }
+
 }
